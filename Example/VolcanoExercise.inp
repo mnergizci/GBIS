@@ -57,7 +57,7 @@ insar{insarID}.constOffset = 'y';       % Remove constant offset? 'y' or 'n'
 
 insar{insarID}.rampFlag = 'n';          % Remove ramp? 'y' or 'n'
 
-insar{insarID}.sillExp = 0.0078;       % Variogram sill (minus nugget) in m^2. Total sill = sillExp + nugget 
+insar{insarID}.sillExp = 0.78;       % Variogram sill (minus nugget) in m^2. Total sill = sillExp + nugget 
 
 insar{insarID}.range = 7124.292;            % Variogram range in m
 
@@ -79,11 +79,11 @@ insar{insarID}.constOffset = 'y';       % Remove constant offset? 'y' or 'n'
 
 insar{insarID}.rampFlag = 'n';          % Remove ramp? 'y' or 'n'
 
-insar{insarID}.sillExp = 0.0000676;       % Variogram sill (minus nugget) in m^2. Total sill = sillExp + nugget 
+insar{insarID}.sillExp = 0.676;       % Variogram sill (minus nugget) in m^2. Total sill = sillExp + nugget 
 
 insar{insarID}.range = 6128.412;            % Variogram range in m
 
-insar{insarID}.nugget = 0.000417;          % Variogram nugget in m^2
+insar{insarID}.nugget = 0.417;          % Variogram nugget in m^2
 
 insar{insarID}.quadtreeThresh = 0.1^2;  % Quadtree threshold variance in m^2 (e.g., 1e-04 or 0.01^2) or 0 for no downsamping
 
@@ -142,11 +142,11 @@ insar{insarID}.constOffset = 'y';       % Remove constant offset? 'y' or 'n'
 
 insar{insarID}.rampFlag = 'n';          % Remove linear ramp? 'y' or 'n'
 
-insar{insarID}.sillExp = 0.001320;       % Variogram sill (minus nugget) in m^2. Total sill = sillExp + nugget 
+insar{insarID}.sillExp = 0.1320;       % Variogram sill (minus nugget) in m^2. Total sill = sillExp + nugget 
 
 insar{insarID}.range = 8630.483865;            % Variogram range in m
 
-insar{insarID}.nugget = 0.000439;          % Variogram nugget in m^2
+insar{insarID}.nugget = 0.439;          % Variogram nugget in m^2
 
 insar{insarID}.quadtreeThresh = 0.1^2; % Quadtree threshold variance in m^2 (e.g., 1e-04 or 0.01^2) or 0 for no downsamping
 
@@ -205,11 +205,11 @@ insar{insarID}.constOffset = 'y';       % Remove constant offset? 'y' or 'n'
 
 insar{insarID}.rampFlag = 'n';          % Remove linear ramp? 'y' or 'n'
 
-insar{insarID}.sillExp = 0.001320;       % Variogram sill (minus nugget) in m^2. Total sill = sillExp + nugget 
+insar{insarID}.sillExp = 0.1320;       % Variogram sill (minus nugget) in m^2. Total sill = sillExp + nugget 
 
 insar{insarID}.range = 8630.483865;            % Variogram range in m
 
-insar{insarID}.nugget = 0.000439;          % Variogram nugget in m^2
+insar{insarID}.nugget = 0.439;          % Variogram nugget in m^2
 
 insar{insarID}.quadtreeThresh = 0.1^2; % Quadtree threshold variance in m^2 (e.g., 1e-04 or 0.01^2) or 0 for no downsamping
 
@@ -347,8 +347,14 @@ npatch=size(mfunc.m,2);
 clear mfunc
 modelInput.mdisloc{1}.start = zeros(npatch*2,1);      % starting model (opening on each patch)
 modelInput.mdisloc{1}.step =  ones(npatch*2,1)*0.01;  % initial maximium step size
-modelInput.mdisloc{1}.lower = [ones(npatch,1)*-12;ones(npatch,1)*0];      % lower bounds on m
-modelInput.mdisloc{1}.upper = [ones(npatch,1)*0;ones(npatch,1)*7]; % upper bounds on m
+modelInput.mdisloc{1}.lower = [ones(npatch,1)*-10;zeros(npatch,1)];      % lower bounds on m
+modelInput.mdisloc{1}.upper = [zeros(npatch,1);ones(npatch,1)*10.0]; % upper bounds on m
+
+
+%modelInput.mdisloc{1}.start = zeros(npatch*2,1);      % starting model (opening on each patch)
+%modelInput.mdisloc{1}.step =  ones(npatch*2,1)*0.01;  % initial maximium step size
+%modelInput.mdisloc{1}.lower = [ones(npatch,1)*-10;zeros(npatch,1)];      % lower bounds on m
+%modelInput.mdisloc{1}.upper = [zeros(npatch,1);ones(npatch,1)*5]; % upper bounds on m
 
 % point Compound Dislocation Model (pCDM) 'N'
 %                             X       Y       Z     W_X      W_Y     W_Z    Dv_X     Dv_Y    Dv_Z 
