@@ -99,7 +99,57 @@ for i = 1:invpar.nModels % For each source model...
             end
     end
 end
-                
+
+%% Generate G and resolution matrix
+% Initialize los_vector_inSAR as an empty matrix
+los_vector_inSAR = [];
+invCov_total = [];
+% Generate los_vector_inSAR
+for j = 1:length(insar)
+    UEast = cosd(insar{j}.dHeading) .* sind(insar{j}.dIncidence); % East unit vector
+    UNorth = sind(insar{j}.dHeading) .* sind(insar{j}.dIncidence); % North unit vector
+    UVert = cosd(insar{j}.dIncidence); % Vertical unit vector
+    % Combine the vectors into a 3xj matrix and store in los_vector_inSAR
+    los_vector_inSAR = [los_vector_inSAR, [UEast; UNorth; UVert]];
+    invCov_total=blkdiag(invCov_total, insar{j}.invCov);
+end
+
+% Initialize G_total as a cell array
+G_total = cell(1, 3);
+
+% Loop through models and calculate G matrix
+for i = 1:invpar.nModels
+    switch invpar.model{i}
+        case 'MDLC'
+            disp(' ')
+            disp('resolution matrix is calculated for MDLC!..')
+            Np = size(mFunc{i}, 2); % number of patches
+            
+            for i2 = 1:3 % iteration for strike and dip slip
+                if ssdsop{i}(i2)
+                    G_total{i2} = cell(1, Np); % Initialize cells for G_total
+                    for i3 = 1:Np % iteration over number of patches
+                        U_temp = Uunit{i}{i2}{i3}; % 3*nObs, 3 is ENU component
+                        % Compute the dot product of U_temp and los_vector_inSAR
+                        G_total{i2}{i3} = sum(U_temp .* los_vector_inSAR, 1); % Summing along the columns
+                    end
+                end
+            end
+    end
+end
+% Convert G_total{1} to a matrix G_ss
+if ~isempty(G_total{1})
+    G_ss = cell2mat(G_total{1}');
+    G_ss_t= G_ss';
+else
+    G_ss = [];
+end
+G=G_ss_t;
+GT=G';
+Gg=inv(GT*invCov_total*G)*GT*invCov_total;
+resolution_matrices=Gg*G;
+patch_resolution = diag(resolution_matrices);
+
 %% Start core of inversion
 
 sensitivityTest = 0; % Switch off sensitivity test at first iteration
@@ -355,7 +405,7 @@ while iKeep < invpar.nRuns  % While number of iterations is < than number of run
             
             % Save results to temporary file for insepction during
             % inversion
-            save([outputDir,'/temporary.mat'], 'geo', 'mKeep', 'PKeep', 'model', 'gps', 'insar', 'invpar', 'geo', 'modelInput');
+            save([outputDir,'/temporary.mat'], 'geo', 'mKeep', 'PKeep', 'model', 'gps', 'insar', 'invpar', 'geo', 'modelInput', '-v7.3');
             
             % Display current optimal model parameters on screen
             for i=1:length(invpar.model)
@@ -508,6 +558,7 @@ end
 mKeep(:, end - invpar.nSave) = []; % Remove unused preallocated memory
 PKeep(:, end - invpar.nSave) = []; % Remove unused preallocated memory
 
+results.patch_res = patch_resolution;
 results.mKeep = mKeep;
 results.PKeep = PKeep;
 results.model = model;
